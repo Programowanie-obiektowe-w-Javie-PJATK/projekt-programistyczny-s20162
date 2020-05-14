@@ -2,40 +2,59 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        Board board = new Board();
-        Moving moving = new Moving();
-        board.emptyBoard();
-        Scanner in = new Scanner(System.in);
-        boolean play = true;
-        board.addNewRandomToBoard();
-        board.addNewRandomToBoard();
-        board.printBoard();
-
-        do {
-            String action = in.nextLine();
-            char[] myChar;
-            myChar = action.toCharArray();
-            System.out.println();
-            switch (myChar[0]) {
-                case 'j': // j lewo
-                    moving.moveLeft(board.getBoard());
-                    break;
-
-                case 'k': // k dół
-                    moving.moveDown(board.getBoard());
-                    break;
-
-                case 'l': // l prawo
-                    moving.moveRight(board.getBoard());
-                    break;
-
-                case 'i': // i gora
-                    moving.moveUp(board.getBoard());
-                    break;
-            }
+        try {
+            Board board = new Board();
+            board.emptyBoard();
+            Scanner in = new Scanner(System.in);
             board.addNewRandomToBoard();
-            board.printBoard();
-        } while(play);
+            board.addNewRandomToBoard();
+            //board.printBoard();
+            char[] myChar;
+            int rotated=0;
+
+            do {
+                board.setBoard(board.rotateBoard(board.getBoard(),4-rotated));
+                rotated=0;
+                board.printBoard();
+                String action = in.nextLine();
+                myChar = action.toCharArray();
+                System.out.println();
+
+                switch (myChar[0]) {
+                    case 'k': // k dół
+                        rotated=1;
+                        break;
+                    case 'l': // l prawo
+                        rotated=2;
+                        break;
+                    case 'i': // i gora
+                        rotated=3;
+                        break;
+                    case 'j': // j lewo
+                        break;
+                    default:
+                        continue;
+                }
+                board.setBoard(board.rotateBoard(board.getBoard(), rotated));
+                if (!board.move(board.getBoard(), true)) {
+                    System.out.println("Ruch niemożliwy");
+                    continue;
+                }
+                if (board.winCheck(board.getBoard())) {
+                    System.out.println("Gratuluje wygranej!");
+                    break;
+                }
+                board.addNewRandomToBoard();
+
+                if (board.looseCheck(board.getBoard())) {
+                    System.out.println("Niestety przegrałeś!");
+                    break;
+                }
+
+            } while (true);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
 
 
     }
