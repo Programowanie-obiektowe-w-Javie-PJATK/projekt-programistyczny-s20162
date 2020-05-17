@@ -1,6 +1,7 @@
+import java.io.*;
 import java.util.Random;
 
-public class Board {
+public class Board implements Serializable {
     public static final int SIZE = 4;
     private int[][] board = new int[SIZE][SIZE];
 
@@ -155,5 +156,21 @@ public class Board {
         return !move(board, false) && !move(rotateBoard(board, 1), false)
                 && !move(rotateBoard(board, 2), false) &&
                 !move(rotateBoard(board, 3), false);
+    }
+
+    public void saveBoard(Board board) throws IOException {
+        FileOutputStream fileOutputStream = new FileOutputStream("savedGame.dat");
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+        objectOutputStream.writeObject(board);
+        objectOutputStream.close();
+    }
+
+    public Board loadBoard() throws IOException, ClassNotFoundException {
+        Board playingBoard;
+        FileInputStream fileInputStream = new FileInputStream("savedGame.dat");
+        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+        playingBoard = (Board) objectInputStream.readObject();
+        objectInputStream.close();
+        return playingBoard;
     }
 }

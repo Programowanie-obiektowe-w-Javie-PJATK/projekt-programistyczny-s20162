@@ -1,3 +1,4 @@
+import java.io.*;
 import java.util.Scanner;
 
 public class Main {
@@ -32,12 +33,32 @@ public class Main {
                         break;
                     case 'j': // j lewo
                         break;
+                    case 's': // zapis
+                        try {
+                            board.saveBoard(board);
+                        } catch (FileNotFoundException e) {
+                            System.out.println("Brak zapisanej gry.");
+                            continue;
+                        } catch (IOException e) {
+                           System.out.println("cos poszło nie tak ");
+                            continue;
+                        }
+                        continue;
+
+                    case 'w': // wczytanie
+                        try {
+                            board = board.loadBoard();
+                        } catch (FileNotFoundException e) {
+                            System.out.println("Brak zapisanej gry.");
+                            continue;
+                        }
+                        continue;
                     default:
                         continue;
                 }
                 board.setBoard(board.rotateBoard(board.getBoard(), rotated));
                 if (!board.move(board.getBoard(), true)) {
-                    System.out.println("Ruch niemożliwy");
+                    System.out.println("Ruch niemożliwy.");
                     continue;
                 }
                 if (board.winCheck(board.getBoard())) {
@@ -47,7 +68,7 @@ public class Main {
                 board.addNewRandomToBoard();
 
                 if (board.looseCheck(board.getBoard())) {
-                    System.out.println("Niestety przegrałeś!");
+                    System.out.println("Niestety przegrałeś ;( ");
                     break;
                 }
 
