@@ -1,3 +1,5 @@
+package sample;
+
 import java.io.*;
 import java.util.Random;
 
@@ -8,44 +10,50 @@ public class Board implements Serializable {
     public Board() {}
 
     public void emptyBoard() {
-        for (int i=0 ; i<4 ; i++) {
-            for (int j=0 ; j<4 ; j++) {
+        for (int i=0 ; i<Board.SIZE ; i++) {
+            for (int j=0 ; j<Board.SIZE ; j++) {
                 this.board[i][j]=0;
             }
         }
+    }
+
+    public int getPoints() {
+        int sum=1;
+        for (int i=0 ; i<Board.SIZE ; i++) {
+            for (int j=0 ; j<Board.SIZE ; j++) {
+                sum+= (this.board[i][j]+1);
+            }
+        }
+        return sum;
     }
 
     public int[][] getBoard() {
         return this.board;
     }
 
+    public int getBoardElement(int i, int j) {
+        return this.board[i][j];
+    }
+
     public void setBoard(int[][] board) {
         this.board = board;
     }
 
-    public void printBoard() {
-        for (int i=0 ; i<4 ; i++) {
-            for (int j=0 ; j<4 ; j++) {
-                if (j==3) {
-                    System.out.print(this.board[i][j]);
-                } else {
-                    System.out.print(this.board[i][j] + " ");
-                }
-            }
-            System.out.println();
-        }
-    }
-
     public void addNewRandomToBoard() {
         Random rand= new Random();
+        int i,j,chance;
 
-        int i,j;
+
         do {
-            i = rand.nextInt(4);
-            j = rand.nextInt(4);
+            i = rand.nextInt(Board.SIZE);
+            j = rand.nextInt(Board.SIZE);
         } while (this.board[i][j]!=0);
-        this.board[i][j]=(rand.nextInt(2)+1)*2;
-
+        chance= rand.nextInt(100);
+        if (chance<70) {
+            this.board[i][j]=2;
+        } else {
+            this.board[i][j]=4;
+        }
     }
 
     public int[][] rotateBoard(int[][] board, int howMany) {
@@ -78,28 +86,6 @@ public class Board implements Serializable {
         return newBoard;
     }
 
-    private boolean partialMove(int[][] board, int i, boolean execute) {
-        boolean moved = false;
-        for (int j = 0; j < Board.SIZE; j++) {
-            if (board[i][j] != 0) {
-                if (board[i - 1][j] == 0) {
-                    if (execute) {
-                        board[i - 1][j] = board[i][j];
-                        board[i][j] = 0;
-                    }
-                    moved = true;
-                } else if (board[i - 1][j] == board[i][j]) {
-                    if (execute) {
-                        board[i - 1][j] = 2 * board[i][j];
-                        board[i][j] = 0;
-                    }
-                    moved = true;
-                }
-            }
-        }
-        return moved;
-    }
-
     public boolean mergeSwap(int[] verse, boolean execute) {
         boolean moved = false;
         for (int i = 0; i < verse.length; i++) {
@@ -123,6 +109,9 @@ public class Board implements Serializable {
                         } else {
                             return true;
                         }
+                    } else {
+                        if (verse[j]!=0)
+                            break;
                     }
                 }
             }
