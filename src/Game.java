@@ -1,5 +1,3 @@
-package sample;
-
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -10,13 +8,24 @@ import javafx.stage.Stage;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class Main extends Application {
+/**
+ * Obiekt <code>Game</code> glowna klasa gry 2048
+ * @author Adam Lichy
+ * @version 1.0
+ */
+
+public class Game extends Application {
+
     GridPane grid;
     Board board;
     Label message;
     Label points;
     double timePoints = 0;
     long startTime;
+
+    /**
+     * Metoda <code>setGrid</code> wypelnia grid elementami tablicy board oraz ustala parametry wyswietlania
+     */
 
     private void setGrid(Board board, StackPane stackPane) {
         grid = new GridPane();
@@ -29,7 +38,8 @@ public class Main extends Application {
                     label.setStyle("-fx-background-color: rgba(255,255,255,1)");
                 } else {
                     label = new Label(String.valueOf(elementValue));
-                    label.setStyle("-fx-background-color: rgba(252,1,1," + Math.log(elementValue)/11.0 + "); " +
+                    label.setStyle("-fx-background-color: rgba(252,1,1," +
+                            Math.log(elementValue)/11.0 + "); " +
                             "-fx-font-size: 20");
                 }
                 grid.add(label, j, i);
@@ -51,27 +61,35 @@ public class Main extends Application {
         stackPane.getChildren().add(grid);
     }
 
+    /**
+     * Metoda <code>calcPoints</code> liczy zdobyte punkty podczas gry
+     */
+
     private void calcPoints(long startTime) {
         long currentTime = System.nanoTime();
         timePoints+= (double)board.getPoints()/((double)(currentTime-startTime)/1000000);
         this.startTime=currentTime;
     }
 
+    /**
+     * Metoda <code>start</code> glowna metoda klasy Game, zawiera mechanikie gry oraz budowanue GUI (javaFX) oraz obsluge klawiszy
+     */
+
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) {
         startTime = System.nanoTime();
         board = new Board();
         board.emptyBoard();
         board.addNewRandomToBoard();
         board.addNewRandomToBoard();
         calcPoints(startTime);
-        Button wczytaj = new Button("Wczytaj");
-        wczytaj.setStyle("-fx-font-size: 20");
-        wczytaj.setFocusTraversable(false);
-        HBox.setHgrow(wczytaj, Priority.ALWAYS);
+        Button load = new Button("Wczytaj");
+        load.setStyle("-fx-font-size: 20");
+        load.setFocusTraversable(false);
+        HBox.setHgrow(load, Priority.ALWAYS);
         StackPane stackPane = new StackPane();
-        wczytaj.setMaxWidth(Double.MAX_VALUE);
-        wczytaj.setOnAction(actionEvent -> {
+        load.setMaxWidth(Double.MAX_VALUE);
+        load.setOnAction(actionEvent -> {
             try {
                 board = board.loadBoard();
                 setGrid(board,stackPane);
@@ -86,12 +104,12 @@ public class Main extends Application {
             }
         });
 
-        Button zapisz = new Button("Zapisz");
-        zapisz.setFocusTraversable(false);
-        zapisz.setStyle("-fx-font-size: 20");
-        HBox.setHgrow(zapisz, Priority.ALWAYS);
-        zapisz.setMaxWidth(Double.MAX_VALUE);
-        zapisz.setOnAction(actionEvent -> {
+        Button save = new Button("Zapisz");
+        save.setFocusTraversable(false);
+        save.setStyle("-fx-font-size: 20");
+        HBox.setHgrow(save, Priority.ALWAYS);
+        save.setMaxWidth(Double.MAX_VALUE);
+        save.setOnAction(actionEvent -> {
             try {
                 board.saveBoard(board);
             } catch (IOException e) {
@@ -99,7 +117,7 @@ public class Main extends Application {
             }
         });
 
-        HBox hbox = new HBox(wczytaj, zapisz);
+        HBox hbox = new HBox(load, save);
         setGrid(board,stackPane);
         stackPane.setMaxSize(Board.SIZE*100, Board.SIZE*100);
         BorderPane borderPane = new BorderPane();
@@ -142,11 +160,11 @@ public class Main extends Application {
             }
             board.setBoard(board.rotateBoard(board.getBoard(), rotated));
             if (board.looseCheck(board.getBoard())) {
-                message.setText("Przerana!");
+                message.setText("Przegrana!");
                 board.setBoard(board.rotateBoard(board.getBoard(),4-rotated));
                 return;
             }
-            if (!board.move(board.getBoard(), true)) {
+            if (!board.moveIsPossible(board.getBoard(), true)) {
                 message.setText("Ruch niemozliwy!");
                 board.setBoard(board.rotateBoard(board.getBoard(),4-rotated));
                 return;
@@ -168,6 +186,11 @@ public class Main extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
+
+    /**
+     * Metoda <code>main</code> statyczna metoda odpalajaca gre
+     */
+
     public static void main(String[] args) {
         launch(args);
     }
